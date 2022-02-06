@@ -3,11 +3,11 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "tsc && nodemon dist/index.js"
-  },
   "keywords": [],
+  "scripts": {
+    "compile": "tsc && node dist/index.js",
+    "dev": "nodemon -e ts --exec \"npm run compile\""
+  },
   "author": "",
   "license": "ISC",
   "dependencies": {
