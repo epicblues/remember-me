@@ -14,10 +14,13 @@ services:
     command:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
+  redis:
+    image: redis:latest
 
   server:
     depends_on:
       - mysql
+      - redis
     build: ./server
     ports:
       - 5000:5000

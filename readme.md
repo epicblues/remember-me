@@ -8,7 +8,6 @@
   - 조회수
   - 기타 사용자 정의 우선순위
 
-
 ## 해결 대상 문제
 
 #### 기록들은 필연적으로 팽창한다.
@@ -23,22 +22,46 @@
 - 위로가 될 수 있는 영화/소설 속 문장
 - 다른 영역에도 도움이 될 수 있는 아이디어들
 
-
-
 ## 사용 기술(예정)
 
 ### Client
 
-* React
+- React
 
 ### Server
 
-* Express.js
-* Mysql
-* TypeORM
-* Redis(Session)
+- Express.js
+- Mysql
+- TypeORM
+- Redis(Session)
 
 ### CI/CD
 
-* Docker
+- Docker
 
+## 문제
+
+### Session 저장 문제 => 해결
+
+- 세션 아이디가 올바르게 저장되지 않았다.
+- key값이 되어야 할 name이 value값에 들어갔다.
+  - name=sessionId 로 나와야 하는데
+  - 공백=name 으로 들어감
+
+```javascript
+app.use(
+    session({
+      name: COOKIE_NAME,
+      // process.env.COOKIE_NAME
+      // COOKIE_NAME = "qid" 로 저장
+      store: new RedisStore({
+        client: redis,
+        disableTouch: true,
+        disableTTL: true,
+      }),
+```
+
+- 인용 부호까지 문자열로 인식되어 저장되는 것을 확인
+- .env 파일에 COOKIE_NAME에서 인용 부호를 제거하고 해결.
+  - dotenv 모듈에서 인용 부호를 알아서 제거하는 줄 알았다.
+  - COOKIE_NAME=qid로 변경
