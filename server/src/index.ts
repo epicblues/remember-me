@@ -1,4 +1,4 @@
-import express from "express";
+import express, { json } from "express";
 import dotenv from "dotenv";
 dotenv.config();
 import "reflect-metadata";
@@ -8,6 +8,7 @@ import connectRedis from "connect-redis";
 import session from "express-session";
 import Redis from "ioredis";
 import { COOKIE_NAME, __prod__ } from "./constants";
+import userRouter from "./router/user";
 
 const app = express();
 
@@ -51,36 +52,8 @@ const app = express();
     })
   );
 
-  app.get("/", (req, res) => {
-    const mySession = req.session as Express.Request["session"] & {
-      userName: string;
-    };
-    console.log(mySession);
-    if (mySession.userName) {
-      res.send(`hello ${mySession.userName} you logined`);
-    } else {
-      mySession.userName = "KMS" + Math.floor(Math.random() * 9);
-      // mySession.save();
-      res.send(`hello ${mySession.userName}`);
-    }
-  });
-
-  app.get("/join/:name", async (req, res) => {
-    const name = req.params.name;
-    if (!name) {
-      return res.send("no name");
-    }
-    const user = User.create({ name });
-    await User.save(user);
-
-    return res.send(user.name);
-  });
-
-  app.get("/user", async (_, res) => {
-    const users = await User.find();
-
-    res.json(users);
-  });
+  app.use(json());
+  app.use("/user", userRouter);
 
   const port = process.env.PORT;
   app.listen(port, () => {
