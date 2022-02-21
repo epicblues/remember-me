@@ -1,13 +1,11 @@
-import express, { json } from "express";
 import dotenv from "dotenv";
-dotenv.config();
+dotenv.config(); // 환경 변수를 활용하는 다른 로직들보다 앞에 있어야 한다.
+import express, { json } from "express";
 import "reflect-metadata";
 import { createConnection } from "typeorm";
 import { User } from "./entities/User";
-import connectRedis from "connect-redis";
-import session from "express-session";
-import Redis from "ioredis";
-import { COOKIE_NAME, __prod__ } from "./constants";
+import { errorHandler } from "./middlewares/errorHandler";
+import { sessionHandler } from "./middlewares/sessionHandler";
 import userRouter from "./router/user";
 
 const app = express();
@@ -27,33 +25,18 @@ const app = express();
     // subscribers: ["src/subscriber/**/*.ts"],
   });
 
-  const RedisStore = connectRedis(session);
-  const redis = new Redis({
-    host: "redis",
-  });
-
-  app.use(
-    session({
-      name: COOKIE_NAME,
-      store: new RedisStore({
-        client: redis,
-        disableTouch: true,
-        disableTTL: true,
-      }),
-      cookie: {
-        maxAge: 1000 * 60 * 60 * 24 * 365 * 10,
-        httpOnly: true,
-        sameSite: "lax",
-        secure: __prod__,
-      },
-      saveUninitialized: true,
-      secret: process.env.SESSION_SECRET!,
-      resave: false,
-    })
-  );
+  app.use(sessionHandler);
 
   app.use(json());
   app.use("/user", userRouter);
+
+  app.get("/error", (_, __, next) => {
+    next(new Error("error testing"));
+  });
+
+  // 에러 처리
+  // 이전 미들웨어에서 next(error)를 호출하면 이 미들웨어로 요청 처리
+  app.use(errorHandler);
 
   const port = process.env.PORT;
   app.listen(port, () => {
