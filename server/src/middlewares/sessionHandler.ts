@@ -5,9 +5,7 @@ import { COOKIE_NAME, __prod__ } from "../constants";
 import Redis from "ioredis";
 
 const RedisStore = connectRedis(session);
-const redis = new Redis({
-  host: "redis",
-});
+const redis = new Redis();
 export const sessionHandler: RequestHandler = session({
   name: COOKIE_NAME,
   store: new RedisStore({
