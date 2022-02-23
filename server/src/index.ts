@@ -5,11 +5,13 @@ import "reflect-metadata";
 import { createConnection } from "typeorm";
 import { Memo } from "./entities/Memo";
 import { User } from "./entities/User";
+import { authHandler } from "./middlewares/authHandler";
 import {
   errorHandler,
   noResponseHandler,
 } from "./middlewares/exceptionHandler";
 import { sessionHandler } from "./middlewares/sessionHandler";
+import memoRouter from "./router/memoRouter";
 import userRouter from "./router/userRouter";
 
 const app = express();
@@ -33,6 +35,9 @@ const app = express();
 
   app.use(json());
   app.use("/user", userRouter);
+
+  // Memo는 회원만 이용할 수 있다.
+  app.use("/memo", authHandler, memoRouter);
 
   // url과 일치하는 미들웨어가 존재하지 않을 때
   app.use(noResponseHandler);

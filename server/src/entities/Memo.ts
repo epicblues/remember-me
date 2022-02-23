@@ -15,7 +15,7 @@ export class Memo extends BaseEntity {
   @Column({ type: "varchar", length: 200 })
   title!: string;
 
-  @Column({ type: "longtext" })
+  @Column({ type: "varchar", length: 1000 })
   content!: string;
 
   @ManyToOne(() => User, (user) => user.id, { cascade: ["remove"] })
