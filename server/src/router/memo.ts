@@ -1,5 +1,5 @@
 import express from "express";
-import { createMemo, showMemos } from "../controllers/memoController";
+import { createMemo, showMemos } from "../controllers/memo";
 
 const memoRouter = express.Router();
 

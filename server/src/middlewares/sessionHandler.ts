@@ -1,13 +1,14 @@
 import connectRedis from "connect-redis";
 import { RequestHandler } from "express";
 import session from "express-session";
-import { COOKIE_NAME, __prod__ } from "../constants";
+import { __prod__ } from "../constants";
 import Redis from "ioredis";
+import env from "../config/dotenvConfig";
 
 const RedisStore = connectRedis(session);
 const redis = new Redis();
 export const sessionHandler: RequestHandler = session({
-  name: COOKIE_NAME,
+  name: env.COOKIE_NAME,
   store: new RedisStore({
     client: redis,
     disableTouch: true,
@@ -20,6 +21,6 @@ export const sessionHandler: RequestHandler = session({
     secure: __prod__,
   },
   saveUninitialized: true,
-  secret: process.env.SESSION_SECRET!,
+  secret: env.SESSION_SECRET,
   resave: false,
 });
