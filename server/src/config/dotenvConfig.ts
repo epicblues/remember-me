@@ -8,7 +8,7 @@ const env = {
   DB_PASSWORD: process.env.DB_PASSWORD!,
   COOKIE_NAME: process.env.COOKIE_NAME!,
   SESSION_SECRET: process.env.SESSION_SECRET!,
-};
+} as const;
 
 // dotenv의 실행 결과 process.env에 원하는 데이터들이 정확하게 들어왔는지 확인
 Object.values(env).forEach((value) => {

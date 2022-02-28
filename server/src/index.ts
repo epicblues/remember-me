@@ -2,12 +2,9 @@ import "reflect-metadata";
 import env from "./config/dotenvConfig";
 import express, { json } from "express";
 import { dbConnectionPromise } from "./config/typeorm";
-import { authHandler } from "./middlewares/authHandler";
-import {
-  errorHandler,
-  noResponseHandler,
-} from "./middlewares/exceptionHandler";
-import { sessionHandler } from "./middlewares/sessionHandler";
+import { authHandler } from "./middlewares/auth";
+import { errorHandler, noResponseHandler } from "./middlewares/exception";
+import { sessionHandler } from "./middlewares/session";
 import memoRouter from "./router/memo";
 import userRouter from "./router/user";
 
