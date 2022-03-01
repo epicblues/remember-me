@@ -11,9 +11,11 @@ const env = {
 } as const;
 
 // dotenv의 실행 결과 process.env에 원하는 데이터들이 정확하게 들어왔는지 확인
-Object.values(env).forEach((value) => {
-  if (value === undefined)
-    throw new ReferenceError("Dotenv file have undefined properties");
+Object.entries(env).forEach((value) => {
+  if (value[1] === undefined)
+    throw new ReferenceError(
+      `Dotenv file have undefined properties : ${value[0]}`
+    );
 });
 
 export default env;

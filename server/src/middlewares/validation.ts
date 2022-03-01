@@ -1,5 +1,5 @@
 import { RequestHandler } from "express";
-import { body, ValidationChain, validationResult } from "express-validator";
+import { body, validationResult } from "express-validator";
 
 const validationErrorHandler: RequestHandler = (req, res, next) => {
   const errors = validationResult(req);
@@ -10,7 +10,7 @@ const validationErrorHandler: RequestHandler = (req, res, next) => {
   return next();
 };
 
-export const usernamePasswordValidate: (RequestHandler | ValidationChain)[] = [
+export const usernamePasswordValidate: RequestHandler[] = [
   body("name")
     .trim()
     .isLength({ min: 4, max: 20 })

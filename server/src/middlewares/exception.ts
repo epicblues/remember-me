@@ -8,3 +8,13 @@ export const errorHandler: ErrorRequestHandler = (error, _, res, __) => {
   console.error(error);
   res.status(500).send(res.statusCode + " Internal Server Error");
 };
+
+export const userExceptionHandler: ErrorRequestHandler = (
+  error,
+  _,
+  res,
+  __
+) => {
+  console.error(error);
+  res.status(401).json({ message: error.message });
+};
