@@ -18,6 +18,6 @@ export class User extends BaseEntity {
   @Column()
   password!: string;
 
-  @OneToMany(() => Memo, (memo) => memo.user)
+  @OneToMany(() => Memo, (memo) => memo.author)
   memos!: Memo[];
 }
