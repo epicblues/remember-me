@@ -2,7 +2,18 @@ import { Memo } from "../entities/Memo";
 import { User } from "../entities/User";
 
 export class MemoService {
-  static async createMemo(
+  private static memoService: MemoService;
+
+  static getInstance() {
+    if (MemoService.memoService) {
+      return MemoService.memoService;
+    }
+    return new MemoService();
+  }
+
+  private constructor() {}
+
+  async createMemo(
     authorId: number,
     title: string,
     content: string

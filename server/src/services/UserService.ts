@@ -2,10 +2,18 @@ import { compare, hash } from "bcrypt";
 import { User } from "../entities/User";
 
 export class UserService {
-  static async registerUserAndGetId(
-    name: string,
-    password: string
-  ): Promise<number> {
+  private static userService: UserService;
+
+  static getInstance() {
+    if (this.userService) {
+      return this.userService;
+    }
+    return new UserService();
+  }
+
+  private constructor() {}
+
+  async registerUserAndGetId(name: string, password: string): Promise<number> {
     const hashedPassword = await hash(password, 10);
     const user = User.create({ name, password: hashedPassword });
     try {
@@ -21,7 +29,7 @@ export class UserService {
     }
   }
 
-  static async loginAndGetId(name: string, password: string) {
+  async loginAndGetId(name: string, password: string) {
     const user = await User.findOne({ name });
 
     if (!user) throw new Error("존재하지 않는 이름입니다.");

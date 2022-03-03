@@ -1,10 +1,15 @@
 import express from "express";
-import { createMemo, showMemos } from "../controllers/memo";
-import { memoValidate } from "../middlewares/validation";
+import { MemoController } from "../controllers/memo";
+
+import { validateMemo } from "../middlewares/validation";
 
 const memoRouter = express.Router();
 
-memoRouter.post("/", memoValidate, createMemo);
-memoRouter.get("/", showMemos);
+const memoController = MemoController.getInstance();
+
+memoRouter.post("/", validateMemo, memoController.createMemo);
+memoRouter.get("/", memoController.showMemos);
+// memoRouter.put("/:id", updateMemo);
+// memoRouter.delete("/:id", deleteMemo);
 
 export default memoRouter;

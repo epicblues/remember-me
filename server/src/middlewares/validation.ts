@@ -26,7 +26,7 @@ export const usernamePasswordValidate: RequestHandler[] = [
   validationErrorHandler,
 ];
 
-export const memoValidate: RequestHandler[] = [
+export const validateMemo: RequestHandler[] = [
   body("title")
     .trim()
     .isLength({ min: 2, max: Memo.TITLE_MAX_LENGTH })
