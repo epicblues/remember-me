@@ -3,10 +3,10 @@ import { CustomRequestHandler } from "../types";
 
 export class MemoController {
   private memoService: MemoService;
-  private static memoController: MemoController;
+  private static singleton: MemoController;
 
   static getInstance() {
-    return this.memoController ? this.memoController : new this();
+    return this.singleton ? this.singleton : new this();
   }
 
   private constructor() {
@@ -28,4 +28,19 @@ export class MemoController {
 
     res.json({ message: `${name}님의 메모` });
   };
+
+  deleteMemo: CustomRequestHandler = async (req, res, next) => {
+    const memoId = +req.params.id!;
+    const userId = req.session.userId!;
+    try {
+      await this.memoService.deleteMemo(userId, memoId);
+      res.json({ message: `${memoId}번 메모 삭제` });
+    } catch (e) {
+      next(e);
+    }
+  };
+
+  // updateMemo: CustomRequestHandler = async (req, res) => {
+  //   // const memoId = req.query.id;
+  // };
 }

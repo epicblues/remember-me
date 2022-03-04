@@ -3,7 +3,7 @@ import { UserController } from "../controllers/user";
 
 import { authHandler, checkAlreadyLogined } from "../middlewares/auth";
 import { userExceptionHandler } from "../middlewares/exception";
-import { usernamePasswordValidate } from "../middlewares/validation";
+import { validateUsernamePassword } from "../middlewares/validation";
 
 const userController = UserController.getInstance();
 const userRouter = express.Router();
@@ -11,13 +11,13 @@ const userRouter = express.Router();
 userRouter.post(
   "/",
   checkAlreadyLogined,
-  usernamePasswordValidate,
+  validateUsernamePassword,
   userController.register
 );
 userRouter.post(
   "/login",
   checkAlreadyLogined,
-  usernamePasswordValidate,
+  validateUsernamePassword,
   userController.login
 );
 userRouter.get("/logout", authHandler, userController.logout);

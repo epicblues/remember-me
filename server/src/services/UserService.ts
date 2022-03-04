@@ -2,13 +2,10 @@ import { compare, hash } from "bcrypt";
 import { User } from "../entities/User";
 
 export class UserService {
-  private static userService: UserService;
+  private static singleton: UserService;
 
-  static getInstance() {
-    if (this.userService) {
-      return this.userService;
-    }
-    return new UserService();
+  static getInstance(): UserService {
+    return this.singleton ? this.singleton : new this();
   }
 
   private constructor() {}

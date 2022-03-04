@@ -32,6 +32,9 @@ export class Memo extends BaseEntity {
   })
   author!: User;
 
+  @Column({ nullable: false, unsigned: true })
+  authorId!: number;
+
   @CreateDateColumn()
   createdAt!: Date;
 

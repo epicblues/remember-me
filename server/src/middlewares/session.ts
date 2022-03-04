@@ -20,6 +20,7 @@ export const sessionHandler: RequestHandler = session({
     sameSite: "lax",
     secure: __prod__,
   },
+
   saveUninitialized: true,
   secret: env.SESSION_SECRET,
   resave: false,

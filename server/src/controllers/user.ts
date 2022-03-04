@@ -3,10 +3,10 @@ import { UserService } from "../services/UserService";
 
 export class UserController {
   private userService: UserService;
-  private static userController: UserController;
+  private static singleton: UserController;
 
   static getInstance() {
-    return this.userController ? this.userController : new this();
+    return this.singleton ? this.singleton : new this();
   }
 
   private constructor() {

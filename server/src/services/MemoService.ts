@@ -1,14 +1,13 @@
 import { Memo } from "../entities/Memo";
 import { User } from "../entities/User";
+import { NotFoundException } from "../exceptions/NotFoundException";
+import { UnauthorizedException } from "../exceptions/UnauthorizedExcpetion";
 
 export class MemoService {
-  private static memoService: MemoService;
+  private static singleton: MemoService;
 
   static getInstance() {
-    if (MemoService.memoService) {
-      return MemoService.memoService;
-    }
-    return new MemoService();
+    return this.singleton ? this.singleton : new this();
   }
 
   private constructor() {}
@@ -26,5 +25,24 @@ export class MemoService {
     const resultMemo = await Memo.save(memo);
 
     return resultMemo;
+  }
+
+  private async authenticateAuthor(
+    userId: number,
+    memoId: number
+  ): Promise<boolean> {
+    const memo = await Memo.findOne(memoId);
+    if (!memo) {
+      throw new NotFoundException("메모가 존재하지 않습니다.");
+    }
+    return userId === memo.authorId;
+  }
+
+  async deleteMemo(userId: number, memoId: number) {
+    const isAuthor = await this.authenticateAuthor(userId, memoId);
+    if (!isAuthor) {
+      throw new UnauthorizedException("메모에 대한 권한이 존재하지 않습니다.");
+    }
+    await Memo.delete(memoId);
   }
 }

@@ -11,7 +11,7 @@ const validationErrorHandler: RequestHandler = (req, res, next) => {
   return next();
 };
 
-export const usernamePasswordValidate: RequestHandler[] = [
+export const validateUsernamePassword: RequestHandler[] = [
   body("name")
     .trim()
     .isLength({ min: 4, max: 20 })
