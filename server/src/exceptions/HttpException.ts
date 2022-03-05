@@ -1,6 +1,6 @@
-interface ExceptionMessage {
+export interface ExceptionMessage {
   statusCode: number;
-  message: string;
+  message: string | object;
 }
 
 export abstract class HttpException extends Error {

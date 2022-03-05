@@ -1,11 +1,12 @@
 import { RequestHandler } from "express";
 import { body, validationResult } from "express-validator";
 import { Memo } from "../entities/Memo";
+import { ValidationException } from "../exceptions/ValidationException";
 
-const validationErrorHandler: RequestHandler = (req, res, next) => {
+const validationErrorHandler: RequestHandler = (req, _, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).json({ message: errors.array() });
+    return next(new ValidationException(errors.array()));
   }
 
   return next();

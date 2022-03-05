@@ -1,5 +1,6 @@
 import { compare, hash } from "bcrypt";
 import { User } from "../entities/User";
+import { UnauthorizedException } from "../exceptions/UnauthorizedExcpetion";
 
 export class UserService {
   private static singleton: UserService;
@@ -19,9 +20,9 @@ export class UserService {
     } catch (e: any) {
       console.error(e);
       if (e.code === "ER_DUP_ENTRY") {
-        throw new Error("중복된 이름입니다.");
+        throw new UnauthorizedException("중복된 이름입니다.");
       } else {
-        throw new Error("Database 에러");
+        throw new Error("Database Error");
       }
     }
   }
@@ -29,11 +30,11 @@ export class UserService {
   async loginAndGetId(name: string, password: string) {
     const user = await User.findOne({ name });
 
-    if (!user) throw new Error("존재하지 않는 이름입니다.");
+    if (!user) throw new UnauthorizedException("존재하지 않는 이름입니다.");
 
     const isPasswordCorrect = await compare(password, user.password);
     if (!isPasswordCorrect) {
-      throw new Error("비밀번호가 일치하지 않습니다.");
+      throw new UnauthorizedException("비밀번호가 일치하지 않습니다.");
     }
 
     return user.id;
