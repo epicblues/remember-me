@@ -1,12 +1,9 @@
-import { ValidationError } from "express-validator";
+import { ValidationError } from "class-validator";
 import { ExceptionMessage, HttpException } from "./HttpException";
 
 export class ValidationException extends HttpException {
-  validationErrors: ValidationError[];
-
-  constructor(errors: ValidationError[]) {
+  constructor(private validationErrors: ValidationError[]) {
     super("입력 형식 오류", 400);
-    this.validationErrors = errors;
   }
 
   createJsonMessage(): ExceptionMessage {

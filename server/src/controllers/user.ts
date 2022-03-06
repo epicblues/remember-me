@@ -13,7 +13,7 @@ export class UserController {
     this.userService = UserService.getInstance();
   }
 
-  updateSession(
+  private updateSession(
     session: Parameters<CustomRequestHandler>[0]["session"],
     userId: number,
     name: string

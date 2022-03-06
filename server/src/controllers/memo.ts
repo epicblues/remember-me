@@ -1,3 +1,4 @@
+import { MemoDto } from "../dtos/memo/MemoDto";
 import { MemoService } from "../services/MemoService";
 import { CustomRequestHandler } from "../types";
 
@@ -14,7 +15,8 @@ export class MemoController {
   }
   createMemo: CustomRequestHandler = async (req, res, next) => {
     const authorId = req.session.userId!;
-    const { title, content } = req.body;
+    console.log(req.body);
+    const { title, content } = req.body as MemoDto;
     try {
       const memo = await this.memoService.createMemo(authorId, title, content);
       res.json({ memo });

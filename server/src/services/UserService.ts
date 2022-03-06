@@ -1,6 +1,6 @@
 import { compare, hash } from "bcrypt";
 import { User } from "../entities/User";
-import { UnauthorizedException } from "../exceptions/UnauthorizedExcpetion";
+import { UnauthorizedException } from "../exceptions/UnauthorizedException";
 
 export class UserService {
   private static singleton: UserService;

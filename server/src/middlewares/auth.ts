@@ -1,4 +1,4 @@
-import { UnauthorizedException } from "../exceptions/UnauthorizedExcpetion";
+import { UnauthorizedException } from "../exceptions/UnauthorizedException";
 import { CustomRequestHandler } from "../types";
 
 export const authHandler: CustomRequestHandler = (req, _, next) => {

@@ -1,7 +1,7 @@
 import { Memo } from "../entities/Memo";
 import { User } from "../entities/User";
 import { NotFoundException } from "../exceptions/NotFoundException";
-import { UnauthorizedException } from "../exceptions/UnauthorizedExcpetion";
+import { UnauthorizedException } from "../exceptions/UnauthorizedException";
 
 export class MemoService {
   private static singleton: MemoService;
@@ -45,4 +45,6 @@ export class MemoService {
     }
     await Memo.delete(memoId);
   }
+
+  // async updateMemo(userId: number, memoId: number) {}
 }
