@@ -9,7 +9,7 @@ const memoController = MemoController.getInstance();
 
 memoRouter.post("/", validateMemo, memoController.createMemo);
 memoRouter.get("/", memoController.showMemos);
-// memoRouter.put("/:id", validateMemo, memoController.updateMemo);
+memoRouter.put("/:id", validateMemo, memoController.updateMemo);
 memoRouter.delete("/:id", memoController.deleteMemo);
 
 export default memoRouter;

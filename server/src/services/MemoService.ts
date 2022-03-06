@@ -1,3 +1,4 @@
+import { Connection, getConnection } from "typeorm";
 import { Memo } from "../entities/Memo";
 import { User } from "../entities/User";
 import { NotFoundException } from "../exceptions/NotFoundException";
@@ -7,7 +8,10 @@ export class MemoService {
   private static singleton: MemoService;
 
   static getInstance() {
-    return this.singleton ? this.singleton : new this();
+    if (!this.singleton) {
+      this.singleton = new this();
+    }
+    return this.singleton;
   }
 
   private constructor() {}
@@ -29,9 +33,10 @@ export class MemoService {
 
   private async authenticateAuthor(
     userId: number,
-    memoId: number
+    memoId: number,
+    connection: Connection
   ): Promise<boolean> {
-    const memo = await Memo.findOne(memoId);
+    const memo = await connection.getRepository(Memo).findOne(memoId);
     if (!memo) {
       throw new NotFoundException("메모가 존재하지 않습니다.");
     }
@@ -39,12 +44,31 @@ export class MemoService {
   }
 
   async deleteMemo(userId: number, memoId: number) {
-    const isAuthor = await this.authenticateAuthor(userId, memoId);
+    const connection = getConnection();
+    const isAuthor = await this.authenticateAuthor(userId, memoId, connection);
     if (!isAuthor) {
       throw new UnauthorizedException("메모에 대한 권한이 존재하지 않습니다.");
     }
-    await Memo.delete(memoId);
+    await connection.getRepository(Memo).delete(memoId);
   }
 
-  // async updateMemo(userId: number, memoId: number) {}
+  async updateMemo(
+    userId: number,
+    memoId: number,
+    title: string,
+    content: string
+  ) {
+    const connection = getConnection();
+    const isAuthor = await this.authenticateAuthor(userId, memoId, connection);
+    if (!isAuthor) {
+      throw new UnauthorizedException("메모에 대한 권한이 존재하지 않습니다.");
+    }
+
+    let updatedMemo: Memo | undefined;
+    await connection.transaction(async (em) => {
+      await em.update(Memo, { id: memoId }, { title, content });
+      updatedMemo = await em.findOne(Memo, { id: memoId });
+    });
+    return updatedMemo;
+  }
 }

@@ -6,9 +6,11 @@ export class UserController {
   private static singleton: UserController;
 
   static getInstance() {
-    return this.singleton ? this.singleton : new this();
+    if (!this.singleton) {
+      this.singleton = new this();
+    }
+    return this.singleton;
   }
-
   private constructor() {
     this.userService = UserService.getInstance();
   }

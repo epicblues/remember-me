@@ -5,8 +5,11 @@ import { UnauthorizedException } from "../exceptions/UnauthorizedException";
 export class UserService {
   private static singleton: UserService;
 
-  static getInstance(): UserService {
-    return this.singleton ? this.singleton : new this();
+  static getInstance() {
+    if (!this.singleton) {
+      this.singleton = new this();
+    }
+    return this.singleton;
   }
 
   private constructor() {}
@@ -21,9 +24,8 @@ export class UserService {
       console.error(e);
       if (e.code === "ER_DUP_ENTRY") {
         throw new UnauthorizedException("중복된 이름입니다.");
-      } else {
-        throw new Error("Database Error");
       }
+      throw new Error("Database Error");
     }
   }
 

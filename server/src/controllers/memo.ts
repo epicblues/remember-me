@@ -7,7 +7,10 @@ export class MemoController {
   private static singleton: MemoController;
 
   static getInstance() {
-    return this.singleton ? this.singleton : new this();
+    if (!this.singleton) {
+      this.singleton = new this();
+    }
+    return this.singleton;
   }
 
   private constructor() {
@@ -15,7 +18,6 @@ export class MemoController {
   }
   createMemo: CustomRequestHandler = async (req, res, next) => {
     const authorId = req.session.userId!;
-    console.log(req.body);
     const { title, content } = req.body as MemoDto;
     try {
       const memo = await this.memoService.createMemo(authorId, title, content);
@@ -32,7 +34,7 @@ export class MemoController {
   };
 
   deleteMemo: CustomRequestHandler = async (req, res, next) => {
-    const memoId = +req.params.id!;
+    const memoId = +req.params.id;
     const userId = req.session.userId!;
     try {
       await this.memoService.deleteMemo(userId, memoId);
@@ -42,7 +44,21 @@ export class MemoController {
     }
   };
 
-  // updateMemo: CustomRequestHandler = async (req, res) => {
-  //   // const memoId = req.query.id;
-  // };
+  updateMemo: CustomRequestHandler = async (req, res, next) => {
+    const memoId = +req.params.id;
+    const userId = req.session.userId!;
+    const { title, content } = req.body as MemoDto;
+
+    try {
+      const updatedMemo = await this.memoService.updateMemo(
+        userId,
+        memoId,
+        title,
+        content
+      );
+      res.json({ memo: updatedMemo });
+    } catch (e) {
+      next(e);
+    }
+  };
 }
