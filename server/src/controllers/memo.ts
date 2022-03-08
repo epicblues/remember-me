@@ -27,10 +27,25 @@ export class MemoController {
     }
   };
 
-  showMemos: CustomRequestHandler = (req, res) => {
-    const name = req.session.name;
+  showMyMemos: CustomRequestHandler = async (req, res, next) => {
+    const authorId = req.session.userId!;
+    try {
+      const myMemos = await this.memoService.getMyMemos(authorId);
+      return res.json({ memos: myMemos });
+    } catch (e) {
+      return next(e);
+    }
+  };
 
-    res.json({ message: `${name}님의 메모` });
+  showMemo: CustomRequestHandler = async (req, res, next) => {
+    const memoId = +req.params.id!;
+    const authorId = req.session.userId!;
+    try {
+      const memo = await this.memoService.getMemoById(memoId, authorId);
+      res.json({ memo });
+    } catch (e) {
+      next(e);
+    }
   };
 
   deleteMemo: CustomRequestHandler = async (req, res, next) => {

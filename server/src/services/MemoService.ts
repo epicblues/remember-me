@@ -1,4 +1,4 @@
-import { Connection, getConnection } from "typeorm";
+import { getConnection } from "typeorm";
 import { Memo } from "../entities/Memo";
 import { User } from "../entities/User";
 import { NotFoundException } from "../exceptions/NotFoundException";
@@ -31,25 +31,35 @@ export class MemoService {
     return resultMemo;
   }
 
-  private async authenticateAuthor(
-    userId: number,
-    memoId: number,
-    connection: Connection
-  ): Promise<boolean> {
-    const memo = await connection.getRepository(Memo).findOne(memoId);
+  private async findAndAuthenticateMemo(userId: number, memoId: number) {
+    const memo = await Memo.findOne(memoId);
     if (!memo) {
       throw new NotFoundException("메모가 존재하지 않습니다.");
     }
-    return userId === memo.authorId;
-  }
-
-  async deleteMemo(userId: number, memoId: number) {
-    const connection = getConnection();
-    const isAuthor = await this.authenticateAuthor(userId, memoId, connection);
-    if (!isAuthor) {
+    if (userId !== memo.authorId) {
       throw new UnauthorizedException("메모에 대한 권한이 존재하지 않습니다.");
     }
-    await connection.getRepository(Memo).delete(memoId);
+    return memo;
+  }
+
+  async getMemoById(memoId: number, authorId: number) {
+    const memo = await this.findAndAuthenticateMemo(authorId, memoId);
+
+    return memo;
+  }
+  async getMyMemos(authorId: number) {
+    const memos = await Memo.find({ authorId });
+
+    if (memos.length === 0) {
+      throw new NotFoundException("메모가 존재하지 않습니다.");
+    }
+
+    return memos;
+  }
+  async deleteMemo(userId: number, memoId: number) {
+    await this.findAndAuthenticateMemo(userId, memoId);
+
+    await Memo.delete(memoId);
   }
 
   async updateMemo(
@@ -59,12 +69,10 @@ export class MemoService {
     content: string
   ) {
     const connection = getConnection();
-    const isAuthor = await this.authenticateAuthor(userId, memoId, connection);
-    if (!isAuthor) {
-      throw new UnauthorizedException("메모에 대한 권한이 존재하지 않습니다.");
-    }
+    await this.findAndAuthenticateMemo(userId, memoId);
 
     let updatedMemo: Memo | undefined;
+
     await connection.transaction(async (em) => {
       await em.update(Memo, { id: memoId }, { title, content });
       updatedMemo = await em.findOne(Memo, { id: memoId });
