@@ -1,5 +1,6 @@
 import { compare, hash } from "bcrypt";
 import { User } from "../entities/User";
+import { DatabaseException } from "../exceptions/DatabaseException";
 import { UnauthorizedException } from "../exceptions/UnauthorizedException";
 
 export class UserService {
@@ -21,16 +22,20 @@ export class UserService {
       const userResult = await User.save(user);
       return userResult.id;
     } catch (e: any) {
-      console.error(e);
       if (e.code === "ER_DUP_ENTRY") {
         throw new UnauthorizedException("중복된 이름입니다.");
       }
-      throw new Error("Database Error");
+      throw DatabaseException.mapNormalErrorToException(e);
     }
   }
 
   async loginAndGetId(name: string, password: string) {
-    const user = await User.findOne({ name });
+    let user;
+    try {
+      user = await User.findOne({ name });
+    } catch (error) {
+      throw DatabaseException.mapNormalErrorToException(error);
+    }
 
     if (!user) throw new UnauthorizedException("존재하지 않는 이름입니다.");
 

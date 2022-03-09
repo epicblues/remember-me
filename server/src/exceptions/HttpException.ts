@@ -8,10 +8,12 @@ export abstract class HttpException extends Error {
   constructor(
     public message: string,
     statusCode?: number,
-    stack?: Error["stack"]
+    originalError?: Error
   ) {
     super(message);
-    this.stack = stack ? this.stack + `\n${stack}` : this.stack;
+    if (originalError) {
+      this.stack += `\n${originalError.stack}`;
+    }
     this.statusCode = statusCode ? statusCode : 500;
   }
 

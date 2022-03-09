@@ -1,6 +1,7 @@
 import { getConnection } from "typeorm";
 import { Memo } from "../entities/Memo";
 import { User } from "../entities/User";
+import { DatabaseException } from "../exceptions/DatabaseException";
 import { NotFoundException } from "../exceptions/NotFoundException";
 import { UnauthorizedException } from "../exceptions/UnauthorizedException";
 
@@ -26,13 +27,20 @@ export class MemoService {
     memo.author = User.create({ id: authorId });
     memo.content = content;
     memo.title = title;
-    const resultMemo = await Memo.save(memo);
-
-    return resultMemo;
+    try {
+      return Memo.save(memo);
+    } catch (error) {
+      throw DatabaseException.mapNormalErrorToException(error);
+    }
   }
 
   private async findAndAuthenticateMemo(userId: number, memoId: number) {
-    const memo = await Memo.findOne(memoId);
+    let memo;
+    try {
+      memo = await Memo.findOne(memoId);
+    } catch (error) {
+      throw DatabaseException.mapNormalErrorToException(error);
+    }
     if (!memo) {
       throw new NotFoundException("메모가 존재하지 않습니다.");
     }
@@ -48,7 +56,12 @@ export class MemoService {
     return memo;
   }
   async getMyMemos(authorId: number) {
-    const memos = await Memo.find({ authorId });
+    let memos;
+    try {
+      memos = await Memo.find({ authorId });
+    } catch (error) {
+      throw DatabaseException.mapNormalErrorToException(error);
+    }
 
     if (memos.length === 0) {
       throw new NotFoundException("메모가 존재하지 않습니다.");
@@ -69,14 +82,18 @@ export class MemoService {
     content: string
   ) {
     const connection = getConnection();
+
     await this.findAndAuthenticateMemo(userId, memoId);
 
     let updatedMemo: Memo | undefined;
-
-    await connection.transaction(async (em) => {
-      await em.update(Memo, { id: memoId }, { title, content });
-      updatedMemo = await em.findOne(Memo, { id: memoId });
-    });
-    return updatedMemo;
+    try {
+      await connection.transaction(async (em) => {
+        await em.update(Memo, { id: memoId }, { title, content });
+        updatedMemo = await em.findOne(Memo, { id: memoId });
+      });
+      return updatedMemo;
+    } catch (error) {
+      throw DatabaseException.mapNormalErrorToException(error);
+    }
   }
 }
