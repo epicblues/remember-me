@@ -12,6 +12,7 @@ const memoController = MemoController.getInstance();
 
 memoRouter.post("/", validateMemo, memoController.createMemo);
 memoRouter.get("/", authHandler, memoController.showMyMemos);
+memoRouter.get("/random", authHandler, memoController.getRandomMemo);
 memoRouter.get("/:id", authHandler, memoController.showMemo);
 
 memoRouter.put("/:id", validateMemo, memoController.updateMemo);

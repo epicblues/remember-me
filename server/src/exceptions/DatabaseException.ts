@@ -1,7 +1,7 @@
 import { HttpException } from "./HttpException";
 
 export class DatabaseException extends HttpException {
-  constructor(originalError: Error) {
+  private constructor(originalError: Error) {
     super("Database Error", 500, originalError);
   }
   static mapNormalErrorToException(candidate: any) {

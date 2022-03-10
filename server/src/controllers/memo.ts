@@ -27,6 +27,17 @@ export class MemoController {
     }
   };
 
+  getRandomMemo: CustomRequestHandler = async (req, res, next) => {
+    const userId = req.session.userId!;
+
+    try {
+      const memo = await this.memoService.getRandomMemo(userId);
+      res.json({ memo });
+    } catch (e) {
+      next(e);
+    }
+  };
+
   showMyMemos: CustomRequestHandler = async (req, res, next) => {
     const authorId = req.session.userId!;
     try {
