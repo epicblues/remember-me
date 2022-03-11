@@ -1,5 +1,6 @@
 import path from "path";
 import { createConnection } from "typeorm";
+import { __test__ } from "../constants";
 import env from "./dotenvConfig";
 
 export const dbConnectionPromise = createConnection({
@@ -11,7 +12,12 @@ export const dbConnectionPromise = createConnection({
   database: env.DB_NAME,
   synchronize: true,
   logging: true,
-  entities: [path.resolve(".", "dist", "entities/**/*.js")],
+  entities: [
+    __test__
+      ? path.resolve(".", "src", "entities/**/*.ts")
+      : path.resolve(".", "dist", "entities/**/*.js"),
+  ],
+
   // migrations: ["src/migration/**/*.ts"],
   // subscribers: ["src/subscriber/**/*.ts"],
 });
