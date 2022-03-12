@@ -10,14 +10,13 @@ export const dbConnectionPromise = createConnection({
   username: env.DB_USER_NAME,
   password: env.DB_PASSWORD,
   database: env.DB_NAME,
-  synchronize: true,
+  synchronize: __test__,
   logging: true,
   entities: [
     __test__
       ? path.resolve(".", "src", "entities/**/*.ts")
       : path.resolve(".", "dist", "entities/**/*.js"),
   ],
-
-  // migrations: ["src/migration/**/*.ts"],
+  migrations: __test__ ? undefined : ["src/migration/**/*.ts"],
   // subscribers: ["src/subscriber/**/*.ts"],
 });

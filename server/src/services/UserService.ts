@@ -4,6 +4,17 @@ import { DatabaseException } from "../exceptions/DatabaseException";
 import { UnauthorizedException } from "../exceptions/UnauthorizedException";
 
 export class UserService {
+  async removeUserByIdAndPassword(userId: number, password: string) {
+    try {
+      const user = await User.findOne(userId);
+      if (!user) throw new Error("회원 정보 불일치");
+      const isPasswordCorrect = await compare(password, user.password);
+      if (isPasswordCorrect) await User.delete(userId);
+      else throw new Error("회원 정보 불일치");
+    } catch (error) {
+      throw DatabaseException.mapNormalErrorToException(error);
+    }
+  }
   private static singleton: UserService;
 
   static getInstance() {
