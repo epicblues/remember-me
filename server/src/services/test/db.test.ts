@@ -1,5 +1,5 @@
 import { Connection } from "typeorm";
-import { dbConnectionPromise } from "../../config/typeorm";
+import { dbConnectionPromise } from "../../config/dbConnection";
 import MemoServiceTest from "./MemoServiceTest";
 import UserServiceTest from "./UserServiceTest";
 

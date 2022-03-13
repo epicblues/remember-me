@@ -1,7 +1,7 @@
 import "reflect-metadata";
 import env from "./config/dotenvConfig";
 import express, { json } from "express";
-import { dbConnectionPromise } from "./config/typeorm";
+import { dbConnectionPromise } from "./config/dbConnection";
 import { authHandler } from "./middlewares/auth";
 import { errorHandler, noResponseHandler } from "./middlewares/exception";
 import { sessionHandler } from "./middlewares/session";

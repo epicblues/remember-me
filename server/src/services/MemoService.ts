@@ -8,32 +8,6 @@ import { UnauthorizedException } from "../exceptions/UnauthorizedException";
 import { removeSuffixAndConvertToClassInstance } from "./util";
 
 export class MemoService {
-  async getRandomMemo(userId: number) {
-    let memo;
-    try {
-      await getConnection().transaction(async (em) => {
-        const memos = await em
-          .getRepository(Memo)
-          .createQueryBuilder()
-          .where("authorId = " + userId)
-          .orderBy("count", "ASC")
-          .limit(1)
-          .execute();
-        if (memos.length === 0) {
-          throw new NotFoundException("작성하신 메모가 존재하지 않습니다.");
-        }
-        memo = removeSuffixAndConvertToClassInstance(memos[0], Memo);
-        await em.getRepository(Memo).update(memo.id, { count: ++memo.count });
-      });
-    } catch (error) {
-      if (error instanceof HttpException) {
-        throw error;
-      }
-      throw DatabaseException.mapNormalErrorToException(error);
-    }
-
-    return memo;
-  }
   private static singleton: MemoService;
 
   static getInstance() {
@@ -60,6 +34,33 @@ export class MemoService {
     } catch (error) {
       throw DatabaseException.mapNormalErrorToException(error);
     }
+  }
+
+  async getRandomMemo(userId: number) {
+    let memo;
+    try {
+      await getConnection().transaction(async (em) => {
+        const memos = await em
+          .getRepository(Memo)
+          .createQueryBuilder()
+          .where("authorId = " + userId)
+          .orderBy("count", "ASC")
+          .limit(1)
+          .execute();
+        if (memos.length === 0) {
+          throw new NotFoundException("작성하신 메모가 존재하지 않습니다.");
+        }
+        memo = removeSuffixAndConvertToClassInstance(memos[0], Memo);
+        await em.getRepository(Memo).update(memo.id, { count: ++memo.count });
+      });
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      throw DatabaseException.mapNormalErrorToException(error);
+    }
+
+    return memo;
   }
 
   private async findAndAuthenticateMemo(userId: number, memoId: number) {
@@ -124,6 +125,9 @@ export class MemoService {
         await em.update(Memo, { id: memoId }, { title, content });
         updatedMemo = await em.findOne(Memo, { id: memoId });
       });
+      if (updatedMemo === undefined) {
+        throw new Error();
+      }
       return updatedMemo;
     } catch (error) {
       throw DatabaseException.mapNormalErrorToException(error);

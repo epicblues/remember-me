@@ -23,9 +23,8 @@ export default () =>
         "test2",
         "test2"
       );
-      expect(
-        updatedMemo instanceof Memo && updatedMemo.content === "test2"
-      ).toBe(true);
+      expect(updatedMemo).toBeInstanceOf(Memo);
+      expect(updatedMemo.content).toBe("test2");
     });
 
     it("deleteMemo should delete memo created By test", async () => {
