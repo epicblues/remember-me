@@ -8,43 +8,46 @@
  * @format
  */
 
-import axios from 'axios';
+import { AxiosError } from 'axios';
 import React, { useState } from 'react';
 import { Button, Text, TextInput, View } from 'react-native';
+import { inputStyle, mainStyle, titleStyle } from './App.style';
+import SingleMemo from './component/SingleMemo';
+import { UserService } from './service/userService';
 
-const App = () => {
-  const [isLogined, setIsLogined] = useState(false);
+interface AppProps {
+  userService: UserService;
+}
+
+const App: React.FC<AppProps> = ({ userService }) => {
+  const [isLogined, setIsLogined] = useState(() => !userService.name);
   const [userInput, setUserInput] = useState({ name: '', password: '' });
+
   const postUser = async () => {
     console.log('clicked');
     try {
-      const { data } = await axios.post(
-        'http://localhost:5000/user/login',
-        userInput,
-      );
-      console.log(data);
+      await userService.login(userInput.name, userInput.password);
       setIsLogined(true);
       setUserInput({ name: '', password: '' });
     } catch (error) {
-      console.log(error);
+      const message = (error as AxiosError).response?.data;
+      console.log(message);
+      setUserInput({
+        name: JSON.stringify(message.message),
+        password: '' + message.statusCode,
+      });
     }
   };
 
   return (
-    <View
-      style={{
-        display: 'flex',
-        justifyContent: 'space-around',
-        padding: 20,
-        height: '80%',
-      }}>
+    <View style={mainStyle}>
       {!isLogined ? (
         <>
-          <Text style={{ fontSize: 40 }}>로그인 해주세요</Text>
+          <Text style={titleStyle}>로그인 해주세요</Text>
           <Text>이름</Text>
           <TextInput
             placeholder="name"
-            style={{ borderWidth: 1 }}
+            style={inputStyle}
             value={userInput.name}
             onChangeText={e => setUserInput(s => ({ ...s, name: e }))}
           />
@@ -52,23 +55,43 @@ const App = () => {
           <TextInput
             textContentType="password"
             placeholder="Password"
-            style={{ borderWidth: 1 }}
-            value={userInput.password}
-            onChangeText={e => setUserInput(s => ({ ...s, password: e }))}
+            style={inputStyle}
+            value={changeToPasswordStyle(userInput.password)}
+            onChangeText={e => {
+              setUserInput(s => ({
+                ...s,
+                password:
+                  s.password.length < e.length
+                    ? s.password + e[e.length - 1]
+                    : s.password.substring(0, s.password.length - 1),
+              }));
+            }}
           />
           <Button title="로그인하기" onPress={postUser} />
         </>
       ) : (
-        <Button
-          title="Logout"
-          onPress={async () => {
-            await axios.get('http://localhost:5000/user/logout');
-            setIsLogined(false);
-          }}
-        />
+        <>
+          <Text children={userService.name + '님 환영합니다.'} />
+          <SingleMemo />
+          <Button
+            title="Logout"
+            onPress={async () => {
+              await userService.logout();
+              setIsLogined(false);
+            }}
+          />
+        </>
       )}
     </View>
   );
 };
+
+function changeToPasswordStyle(input: string) {
+  const buffer = [];
+  for (let i = 0; i < input.length; i++) {
+    buffer.push('*');
+  }
+  return buffer.join('');
+}
 
 export default App;
